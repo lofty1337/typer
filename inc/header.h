@@ -5,6 +5,9 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <random>
+#include <algorithm>
+#include <iterator>
 
 class Game
 {
@@ -21,8 +24,6 @@ public:
     ~Game(){};
     bool Setup();
     void lifeCycle();
-    void menuCycle(std::vector<sf::Text> escTexts, sf::RenderWindow window);
-    void gameCycle();
     sf::Vector2f getCenter()
     {
         sf::Vector2f center((float)width/2, (float)height/2);
