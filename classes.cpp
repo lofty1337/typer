@@ -2,6 +2,10 @@
 #define SPACE_KEY 32
 #define BACKSPACE_KEY 8
 #define ESCAPE_KEY 27
+#define TAB_KEY 9
+#define WPM_STR "WPM: "
+#define START_STR "Start (tab)"
+#define QUIT_STR "Quit (esc)"
 Game::Game(){
     bgColor = sf::Color(47,79,79, 255);
     font.loadFromFile("fonts/arial.ttf");
@@ -38,17 +42,19 @@ Game::Game(){
     scoreText.setCharacterSize(50);
     scoreText.setPosition(sf::VideoMode::getDesktopMode().width-250,0);
 
-
-    escTexts.push_back(sf::Text("WPM:"+std::to_string(score), font));
-    escTexts.push_back(sf::Text("Start", font));
-    escTexts.push_back(sf::Text("Quit", font));
+    float height=0;
+    escTexts.push_back(sf::Text(WPM_STR+std::to_string(score), font));
+    escTexts.push_back(sf::Text(START_STR, font));
+    escTexts.push_back(sf::Text(QUIT_STR, font));
     for (int i = 0; i < escTexts.size(); i++) {
         escTexts[i].setCharacterSize(chSize);
+        height+=escTexts[i].getGlobalBounds().height;
         escTexts[i].setOrigin(sf::Vector2f(0,0));
         escTexts[i].setFillColor(sf::Color::White);
-        escTexts[i].setPosition(getCenter().x - escTexts[i].getGlobalBounds().width / 2,
-                                getCenter().y + chSize * i - escTexts[i].getGlobalBounds().height * escTexts.size());
     }
+    for(int i =0;i<escTexts.size();i++)
+        escTexts[i].setPosition(getCenter().x - escTexts[i].getGlobalBounds().width / 2,
+                                getCenter().y -height/2-escTexts[escTexts.size()-i-1].getGlobalBounds().height*(escTexts.size()-i-1));
 
     timer.setFillColor(sf::Color::White);
     timer.setFont(font);
@@ -69,7 +75,7 @@ void Game::lifeCycle() {
         else
             gameplay();
         if (clock.getElapsedTime().asSeconds() >= 60) {
-            escTexts[0].setString("WPM: "+std::to_string(score));
+            escTexts[0].setString(WPM_STR+std::to_string(score));
             clock.restart();
             escCount++;
         }
@@ -94,9 +100,6 @@ void Game::escMenu(){
     for (int i = 0; i < escTexts.size(); i++)
         if(!((i==0)&&(escCount<1)))//{
             window.draw(escTexts[i]);
-            //if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
-
-        //}
 }
 void Game::eventLoop(sf::Event event) {
     switch (event.type) {
@@ -104,16 +107,27 @@ void Game::eventLoop(sf::Event event) {
             window.close();
         case sf::Event::KeyPressed:
             if (event.key.code == sf::Keyboard::Escape) {
-                escTexts[0].setString("WPM: " + std::to_string(score));
-                startGame();
-                inStr.clear();
+                if(escCount%2==0)
+                    window.close();
+                else {
+                    escTexts[0].setString(WPM_STR + std::to_string(score));
+                    escTexts[0].setPosition(getCenter().x - escTexts[0].getGlobalBounds().width / 2,
+                                            getCenter().y -height/2-
+                                            escTexts[escTexts.size()-1].getGlobalBounds().height*(escTexts.size()-1));
+                    startGame();
+                    inStr.clear();
+                }
             }
+            if (event.key.code == sf::Keyboard::Tab)
+                if(escCount%2==0)
+                    startGame();
             break;
         case sf::Event::TextEntered:
             if ((event.text.unicode < 128)
                 && (event.text.unicode != BACKSPACE_KEY)
                 && (event.text.unicode != SPACE_KEY)
-                   && (event.text.unicode != ESCAPE_KEY)) {
+                   && (event.text.unicode != ESCAPE_KEY)
+                      && (event.text.unicode != TAB_KEY)) {
                 typed = static_cast<char>(event.text.unicode);
                 inStr += typed;
             }
@@ -130,20 +144,6 @@ void Game::eventLoop(sf::Event event) {
                     shuffleStream();
                 inStr.clear();
             }
-        case sf::Event::MouseButtonPressed:
-            if (event.mouseButton.button == sf::Mouse::Left)
-                for (int i = 0; i < escTexts.size(); i++){
-                    if (sf::Mouse::getPosition().x >= escTexts[i].getPosition().x)
-                        if (sf::Mouse::getPosition().x <=
-                            escTexts[i].getPosition().x + escTexts[i].getGlobalBounds().width)
-                            if (sf::Mouse::getPosition().y >= escTexts[i].getPosition().y)
-                                if (sf::Mouse::getPosition().y <=
-                                    escTexts[i].getPosition().y + escTexts[i].getGlobalBounds().height)
-                                    if (escTexts[i].getString() == "Quit")
-                                        window.close();
-                                    else if (escTexts[i].getString() == "Start")
-                                        startGame();
-                }
     }
 }
 void Game::gameplay() {

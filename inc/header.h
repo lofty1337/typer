@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <iterator>
 #include <ctime>
+#include <cmath>
 class Game
 {
 private:
