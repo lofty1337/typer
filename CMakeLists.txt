@@ -3,8 +3,7 @@ project(typer)
 
 set(CMAKE_CXX_STANDARD 14)
 
-
-add_executable(typer main.cpp inc/header.h classes.cpp)
+add_executable(typer src/main.cpp src/game.cpp inc/header.h)
 
 set(SFML_STATIC_LIBRARIES TRUE)
 set(SFML_DIR SFML/lib/cmake/SFML)

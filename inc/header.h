@@ -22,6 +22,8 @@ private:
     sf::RectangleShape field;
     sf::Text input;
     sf::Text stream;
+    sf::RectangleShape underline;
+    sf::Vector2f underlineDefSize;
     sf::Text scoreText;
     sf::Text timer;
     std::string inStr;
@@ -30,6 +32,7 @@ private:
     int score;
     int wordCount;
     int escCount;
+    int inChSize;
     int chSize;
     int streamChSize;
     char typed;
@@ -50,4 +53,5 @@ public:
     void escMenu();
     void eventLoop(sf::Event event);
     void gameplay();
+    bool isMenuOpened();
 };
